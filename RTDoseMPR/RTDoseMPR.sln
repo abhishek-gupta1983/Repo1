@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RTDoseMPR", "RTDoseMPR.vcproj", "{F2C2C061-CAE1-4CE3-869A-37A2188E6D89}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RTStructureSetMPR", "..\RTStructureSetMPR\RTStructureSetMPR.vcproj", "{D35A7902-0A3A-4C54-86BB-200E209C41D9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageRegistration", "..\ImageRegistration\ImageRegistration.vcproj", "{816B328B-70E4-41D3-9F4B-D6894EBB92B4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageQuality", "..\ImageQuality\ImageQuality.vcproj", "{E97018C4-1135-4A4F-BCF8-8BE6F03669A3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageBlend", "..\ImageBlend\ImageBlend.vcproj", "{8D9BBF4E-0023-4AAB-BD61-AC4126DA97C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2C2C061-CAE1-4CE3-869A-37A2188E6D89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F2C2C061-CAE1-4CE3-869A-37A2188E6D89}.Debug|Win32.Build.0 = Debug|Win32
+		{F2C2C061-CAE1-4CE3-869A-37A2188E6D89}.Release|Win32.ActiveCfg = Release|Win32
+		{F2C2C061-CAE1-4CE3-869A-37A2188E6D89}.Release|Win32.Build.0 = Release|Win32
+		{D35A7902-0A3A-4C54-86BB-200E209C41D9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D35A7902-0A3A-4C54-86BB-200E209C41D9}.Debug|Win32.Build.0 = Debug|Win32
+		{D35A7902-0A3A-4C54-86BB-200E209C41D9}.Release|Win32.ActiveCfg = Release|Win32
+		{D35A7902-0A3A-4C54-86BB-200E209C41D9}.Release|Win32.Build.0 = Release|Win32
+		{816B328B-70E4-41D3-9F4B-D6894EBB92B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{816B328B-70E4-41D3-9F4B-D6894EBB92B4}.Debug|Win32.Build.0 = Debug|Win32
+		{816B328B-70E4-41D3-9F4B-D6894EBB92B4}.Release|Win32.ActiveCfg = Release|Win32
+		{816B328B-70E4-41D3-9F4B-D6894EBB92B4}.Release|Win32.Build.0 = Release|Win32
+		{E97018C4-1135-4A4F-BCF8-8BE6F03669A3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E97018C4-1135-4A4F-BCF8-8BE6F03669A3}.Debug|Win32.Build.0 = Debug|Win32
+		{E97018C4-1135-4A4F-BCF8-8BE6F03669A3}.Release|Win32.ActiveCfg = Release|Win32
+		{E97018C4-1135-4A4F-BCF8-8BE6F03669A3}.Release|Win32.Build.0 = Release|Win32
+		{8D9BBF4E-0023-4AAB-BD61-AC4126DA97C9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8D9BBF4E-0023-4AAB-BD61-AC4126DA97C9}.Debug|Win32.Build.0 = Debug|Win32
+		{8D9BBF4E-0023-4AAB-BD61-AC4126DA97C9}.Release|Win32.ActiveCfg = Release|Win32
+		{8D9BBF4E-0023-4AAB-BD61-AC4126DA97C9}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
