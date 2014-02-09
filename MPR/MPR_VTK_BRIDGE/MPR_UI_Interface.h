@@ -21,6 +21,9 @@ namespace MPR_VTK_BRIDGE {
 		~MPR_UI_Interface(void);
 		void InitMPR(String^ path);
 		BitmapWrapper^ GetDisplayImage(int axis);
+		int GetNumberOfImages(int axis);
+		void Scroll(int axis, int delta);
+		int GetCurrentImageIndex(int axis);
 
 	protected:
 		MPR_UI_Interface(void);

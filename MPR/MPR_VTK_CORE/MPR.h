@@ -17,6 +17,8 @@ namespace RTViewer
 		void initFromImage(vtkSmartPointer<vtkImageData> image);
 		vtkSmartPointer<vtkImageData> GetOutputImage(Axis axis);
 		void Scroll(Axis axis, int delta);
+		int GetNumberOfImages(Axis axis);
+		int GetCurrentImageIndex(Axis axis);
 	private:
 		MPRData* d;
 	};

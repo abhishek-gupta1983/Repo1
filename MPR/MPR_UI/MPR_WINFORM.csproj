@@ -52,6 +52,12 @@
     <Compile Include="ImageControl.Designer.cs">
       <DependentUpon>ImageControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImagePanel2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImagePanel2.Designer.cs">
+      <DependentUpon>ImagePanel2.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

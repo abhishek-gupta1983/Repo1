@@ -31,9 +31,6 @@ void MPR_UI_Interface::InitMPR(String^ path)
 	this->m_mpr = new MPR();
 	const char* _path = convert_to_const_charPtr(path);
 	this->m_mpr->initFromDir(_path);
-	this->m_mpr->Scroll(AxialAxis, 4);
-	this->m_mpr->Scroll(CoronalAxis, 200);
-	this->m_mpr->Scroll(SagittalAxis, 200);
 }
 
 BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
@@ -44,4 +41,18 @@ BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
 	image->GetDimensions(dim);
 	BitmapWrapper^ bmp = gcnew BitmapWrapper(image->GetScalarPointer(), dim[0], dim[1], "MONOCHROME");
 	return bmp;
+}
+
+int MPR_UI_Interface::GetNumberOfImages(int axis)
+{
+	return this->m_mpr->GetNumberOfImages((Axis)axis);
+}
+void MPR_UI_Interface::Scroll(int axis, int delta)
+{
+	this->m_mpr->Scroll((Axis)axis, delta);
+}
+
+int MPR_UI_Interface::GetCurrentImageIndex(int axis)
+{
+	return this->m_mpr->GetCurrentImageIndex((Axis)axis);
 }

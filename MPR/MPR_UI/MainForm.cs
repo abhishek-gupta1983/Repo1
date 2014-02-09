@@ -53,18 +53,9 @@ namespace MPR_UI
         {
             MPR_UI_Interface ui_interface = MPR_UI_Interface.GetHandle();
             ui_interface.InitMPR(Settings.Default.DICOM_DIR);
-            //{
-            //    BitmapWrapper bmpWrapper = ui_interface.GetDisplayImage(0);
-            //    axialImage.StoreBitmap = bmpWrapper.StoredBitmap;
-            //}
-            //{
-            //    BitmapWrapper bmpWrapper = ui_interface.GetDisplayImage(1);
-            //    coronalImage.StoreBitmap = bmpWrapper.StoredBitmap;
-            //}
-            //{
-            //    BitmapWrapper bmpWrapper = ui_interface.GetDisplayImage(2);
-            //    sagittalImage.StoreBitmap = bmpWrapper.StoredBitmap;
-            //}
+            axialImage.InitScrollBarAndLoadImage();
+            sagittalImage.InitScrollBarAndLoadImage();
+            coronalImage.InitScrollBarAndLoadImage();
         }
     }
 }

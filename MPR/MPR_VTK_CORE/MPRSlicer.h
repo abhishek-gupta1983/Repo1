@@ -27,6 +27,9 @@ namespace RTViewer
 			void SetReslicePosition(double point[3]);
 			vtkSmartPointer<vtkImageData> GetOutputImage();
 			void Scroll(int delta);
+			int GetNumberOfImages();
+			int GetSlicerPositionAsIndex();
+
 		private:
 			Axis m_axis; // slicer axis
 			vtkSmartPointer<vtkImageReslice> m_reslice; // actual slicer

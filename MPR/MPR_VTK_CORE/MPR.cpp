@@ -73,8 +73,11 @@ void MPR::initFromImage(vtkSmartPointer<vtkImageData> image)
 		d->m_slicers[i] = slicer;
 	}
 
-	double center[3]={0,0,0};
-	d->GetInput()->GetCenter(center);
+	// scroll slicers to get middle image
+	for (int i = 0; i<3; i++)
+	{
+		d->m_slicers[i]->Scroll(d->m_slicers[i]->GetNumberOfImages() / 2);
+	}
 }
 
 vtkSmartPointer<vtkImageData> MPR::GetOutputImage(Axis axis)
@@ -98,4 +101,30 @@ void MPR::Scroll(Axis axis, int delta)
 			d->m_slicers[i]->Scroll(delta);
 		}
 	}
+}
+
+int MPR::GetNumberOfImages(Axis axis)
+{
+	int numberOfImages = 0;
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			numberOfImages = d->m_slicers[i]->GetNumberOfImages();
+		}
+	}
+	return numberOfImages;
+}
+
+int MPR::GetCurrentImageIndex(Axis axis)
+{
+	int idx = 0;
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			idx = d->m_slicers[i]->GetSlicerPositionAsIndex();
+		}
+	}
+	return idx;
 }

@@ -119,3 +119,43 @@ void MPRSlicer::Scroll(int delta)
 	}
 	return;
 }
+
+int MPRSlicer::GetNumberOfImages()
+{
+	int num = 0;
+	switch (this->m_axis)
+	{
+		case AxialAxis:
+			num = this->m_dimension[2];
+			break;
+		case CoronalAxis:
+			num = this->m_dimension[0];
+			break;
+		case SagittalAxis:
+			num = this->m_dimension[1];
+			break;
+		default:
+			break;
+	}
+	return num;
+}
+
+int MPRSlicer::GetSlicerPositionAsIndex()
+{
+	int idx = 0;
+	switch (this->m_axis)
+	{
+		case AxialAxis:
+			idx = this->m_spacing[2]==0 ? 0 : this->m_position/this->m_spacing[2];
+			break;
+		case CoronalAxis:
+			idx = this->m_spacing[0] == 0 ? 0 : this->m_position / this->m_spacing[0];
+			break;
+		case SagittalAxis:
+			idx = this->m_spacing[1] == 0 ? 0 : this->m_position / this->m_spacing[1];
+			break;
+		default:
+			break;
+	}
+	return idx;
+}
