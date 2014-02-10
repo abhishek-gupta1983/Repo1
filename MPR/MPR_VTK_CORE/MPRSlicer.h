@@ -1,4 +1,5 @@
 #pragma once
+#include "rad_util.h"
 #include "enums.h"
 #include "vtkSmartPointer.h"
 #include "vtkImageData.h"
@@ -25,10 +26,11 @@ namespace RTViewer
 			void InitSlicer();
 			void SetResliceMatrix(vtkSmartPointer<vtkMatrix4x4> matrix){this->m_resliceMatrix = matrix;}
 			void SetReslicePosition(double point[3]);
-			vtkSmartPointer<vtkImageData> GetOutputImage();
+			image GetOutputImage();
 			void Scroll(int delta);
 			int GetNumberOfImages();
 			int GetSlicerPositionAsIndex();
+			double GetSlicerPosition();
 
 		private:
 			Axis m_axis; // slicer axis
@@ -36,10 +38,13 @@ namespace RTViewer
 			vtkSmartPointer<vtkMatrix4x4> m_resliceMatrix; // matrix used for slicer orientation & position
 			vtkSmartPointer<vtkImageData> m_inputImage; // input vtkImageData; i.e. image cuboid
 			vtkSmartPointer<vtkImageData> m_outputImage; // output sliced image.
-			vtkSmartPointer<vtkImageMapToWindowLevelColors> m_voilutFilter; // VOI LUT Filter from VTK.
+
 			double m_position;
 			double m_spacing[3];
 			int m_dimension[3];
+			double m_origin[3];
+			void* displayData;
+			image displayImage;
 
 		friend class MPR;
 	};

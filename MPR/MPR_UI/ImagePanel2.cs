@@ -107,9 +107,19 @@ namespace MPR_UI
 				int idx = imgControl.GetScrollbarValue();
 				Font _font = new Font("Verdana", 10.0F);
 				StringBuilder _sb = new StringBuilder();
-				_sb.Append("Image#");
+				_sb.Append("Scroll Pos#");
 				_sb.Append(idx);
 				e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 0));
+
+				_sb.Clear();
+				_sb.Append("Slicer Pos#");
+				_sb.Append(imgControl.Position);
+				e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 20));
+
+				_sb.Clear();
+				_sb.Append("Slicer idx#");
+				_sb.Append(imgControl.Index);
+				e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 40));
 			}
 			base.OnPaint(e);
 		}

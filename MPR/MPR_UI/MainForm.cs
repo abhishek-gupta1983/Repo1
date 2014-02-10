@@ -51,6 +51,7 @@ namespace MPR_UI
 
         private void button1_Click(object sender, EventArgs e)
         {
+            button1.Enabled = false;
             MPR_UI_Interface ui_interface = MPR_UI_Interface.GetHandle();
             ui_interface.InitMPR(Settings.Default.DICOM_DIR);
             axialImage.InitScrollBarAndLoadImage();
