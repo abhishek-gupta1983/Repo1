@@ -34,5 +34,41 @@ namespace MPR_UI.Properties {
                 this["DICOM_DIR"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Tomato")]
+        public global::System.Drawing.Color AxialColor {
+            get {
+                return ((global::System.Drawing.Color)(this["AxialColor"]));
+            }
+            set {
+                this["AxialColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("BlueViolet")]
+        public global::System.Drawing.Color CoronalColor {
+            get {
+                return ((global::System.Drawing.Color)(this["CoronalColor"]));
+            }
+            set {
+                this["CoronalColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Gold")]
+        public global::System.Drawing.Color SagittalColor {
+            get {
+                return ((global::System.Drawing.Color)(this["SagittalColor"]));
+            }
+            set {
+                this["SagittalColor"] = value;
+            }
+        }
     }
 }

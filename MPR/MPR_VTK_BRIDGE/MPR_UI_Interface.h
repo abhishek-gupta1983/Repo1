@@ -25,7 +25,8 @@ namespace MPR_VTK_BRIDGE {
 		void Scroll(int axis, int delta);
 		int GetCurrentImageIndex(int axis);
 		double GetCurrentImagePosition(int axis);
-
+		double GetCurrentImagePositionRelativeToOrigin(int axis);
+		
 	protected:
 		MPR_UI_Interface(void);
 	};

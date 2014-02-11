@@ -23,6 +23,9 @@ namespace RTViewer
 		int GetNumberOfImages(Axis axis);
 		int GetCurrentImageIndex(Axis axis);
 		double GetCurrentImagePosition(Axis axis);
+		double GetCurrentImagePositionRelativeToOrigin(Axis axis);
+		void GetOutputImageDisplayDimensions(Axis axis, int& width, int& height);
+		
 	private:
 		MPRData* d;
 	};

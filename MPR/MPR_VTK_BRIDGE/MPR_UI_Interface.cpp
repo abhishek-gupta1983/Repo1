@@ -64,6 +64,9 @@ BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
 	image displayImage = this->m_mpr->GetOutputImage((Axis)axis);
 	
 	BitmapWrapper^ bmp = gcnew BitmapWrapper(displayImage.data, displayImage.width, displayImage.height, "MONOCHROME");
+	int newWidth, newHeight;
+	this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
+	bmp->Resize(newWidth, newHeight);
 	return bmp;
 }
 
@@ -84,4 +87,9 @@ int MPR_UI_Interface::GetCurrentImageIndex(int axis)
 double MPR_UI_Interface::GetCurrentImagePosition(int axis)
 {
 	return this->m_mpr->GetCurrentImagePosition((Axis)axis);
+}
+
+double MPR_UI_Interface::GetCurrentImagePositionRelativeToOrigin(int axis)
+{
+	return this->m_mpr->GetCurrentImagePositionRelativeToOrigin((Axis)axis);
 }

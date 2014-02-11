@@ -345,3 +345,65 @@ double MPR::GetCurrentImagePosition(Axis axis)
 	}
 	return pos;
 }
+
+double MPR::GetCurrentImagePositionRelativeToOrigin(Axis axis)
+{
+	double pos = 0;
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			
+			pos = d->m_slicers[i]->GetSlicerPosition();
+
+		}
+	}
+	double origin[3];
+	d->GetInput()->GetOrigin(origin);
+	switch (axis)
+	{
+		case RTViewer::AxialAxis:
+			pos -= origin[2];
+			break;
+		case RTViewer::CoronalAxis:
+			pos -= origin[1];
+			break;
+		case RTViewer::SagittalAxis:
+			pos -= origin[0];
+			break;
+		default:
+			break;
+	}
+	return pos;
+}
+
+void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)
+{
+	double spacing[3] = { 0, 0, 0 };
+	d->GetInput()->GetSpacing(spacing);
+	int dim[3] = { 0, 0, 0 };
+	d->GetInput()->GetDimensions(dim);
+	switch (axis)
+	{
+		case RTViewer::AxialAxis:
+		{
+			width = dim[0] * spacing[0];
+			height = dim[1] * spacing[1];
+		}
+			break;
+		case RTViewer::CoronalAxis:
+		{
+			width = dim[0] * spacing[0];
+			height = dim[2] * spacing[2];
+		}
+			break;
+		case RTViewer::SagittalAxis:
+		{
+			width = dim[1] * spacing[1];
+			height = dim[2] * spacing[2];
+		}
+			break;
+		default:
+			break;
+	}
+}

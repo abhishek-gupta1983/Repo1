@@ -5,5 +5,14 @@
     <Setting Name="DICOM_DIR" Type="System.String" Scope="User">
       <Value Profile="(Default)">D:\DicomDataSet\DICOM-RT\BHAVANA\1</Value>
     </Setting>
+    <Setting Name="AxialColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Tomato</Value>
+    </Setting>
+    <Setting Name="CoronalColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">BlueViolet</Value>
+    </Setting>
+    <Setting Name="SagittalColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Gold</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

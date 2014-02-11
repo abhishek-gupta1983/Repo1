@@ -47,7 +47,6 @@ namespace MPR_UI
             this.scrollBar.LargeChange = 1;
             this.scrollBar.Value = m_UIInterface.GetCurrentImageIndex((int)this.m_axis);
             // Init scroll bar event
-            //this.scrollBar.Scroll += scrollBar_Scroll;
             this.scrollBar.ValueChanged += scrollBar_ValueChanged;
             LoadImage();
         }
@@ -71,16 +70,45 @@ namespace MPR_UI
             if (Index != scrollBar.Value)
                 MessageBox.Show("Alert");
             this.m_imagePanel.StoreBitmap = bmpWrapper.StoredBitmap;
+            switch (this.m_axis)
+            {
+                case Axis.AxialAxis:
+                    {
+                        double PositionS = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.SagittalAxis);
+                        double PositionC = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.CoronalAxis);
+                        PointF cursorPoint = new PointF((float)PositionS, (float)PositionC);
+
+                        this.m_imagePanel.SetCursorPositionY_Axis(cursorPoint, Axis.CoronalAxis);
+                        this.m_imagePanel.SetCursorPositionX_Axis(cursorPoint, Axis.SagittalAxis);
+                    }
+                    break;
+                case Axis.CoronalAxis:
+                    {
+                        double PositionA = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.AxialAxis);
+                        double PositionS = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.SagittalAxis);
+
+                        PointF cursorPoint = new PointF((float)PositionS, (float)PositionA);
+                        this.m_imagePanel.SetCursorPositionX_Axis(cursorPoint, Axis.SagittalAxis);
+                        this.m_imagePanel.SetCursorPositionY_Axis(cursorPoint, Axis.AxialAxis);
+
+                    }
+                    break;
+                case Axis.SagittalAxis:
+                    {
+                        double PositionA = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.AxialAxis);
+                        double PositionC = m_UIInterface.GetCurrentImagePositionRelativeToOrigin((int)Axis.CoronalAxis);
+
+                        PointF cursorPoint = new PointF((float)PositionC, (float)PositionA);
+                        this.m_imagePanel.SetCursorPositionX_Axis(cursorPoint, Axis.CoronalAxis);
+                        this.m_imagePanel.SetCursorPositionY_Axis(cursorPoint, Axis.AxialAxis);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
             this.Invalidate();
             
-        }
-
-        void scrollBar_Scroll(object sender, ScrollEventArgs e)
-        {
-            //int diff = e.NewValue - e.OldValue;
-            //m_UIInterface.Scroll((int)this.m_axis, diff);
-            //Application.DoEvents(); 
-            //LoadImage();
         }
 
         internal int GetScrollbarValue()
