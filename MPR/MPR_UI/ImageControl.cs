@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MPR_VTK_BRIDGE;
 using ImageUtils;
+using System.Threading;
 
 namespace MPR_UI
 {
@@ -19,24 +20,41 @@ namespace MPR_UI
         private double m_position;
         private int m_index;
 
-       
-       
         public ImageControl()
         {
             InitializeComponent();
         }
-
+        
         public ImageControl(Axis axis)
         {
             InitializeComponent();
             this.m_axis = axis;
             this.m_imagePanel = new ImagePanel2();
             this.m_imagePanel.Dock = DockStyle.Fill;
+            this.m_imagePanel.EVT_MPRCursorTranslated += TranslateMPRCursor;
             this.panel1.Controls.Add(this.m_imagePanel);
-
             m_UIInterface = MPR_UI_Interface.GetHandle();
+            m_UIInterface.EVT_UpdateImage += Handle_UpdateImage;
+        }
 
-            
+        private void Handle_UpdateImage(BitmapWrapper bmpWrapper, int axis, double reslicerPositionX, double reslicerPositionY)
+        {
+            if (axis == (int)this.m_axis)
+            {
+                MPR_UI_Interface.WriteLog("Handling update image event.");
+                this.m_imagePanel.StoreBitmap = bmpWrapper.StoredBitmap;
+                UpdateCursorPosition();
+                Invalidate();
+                Update();
+            }
+        }
+
+        private void TranslateMPRCursor(Point p)
+        {
+            m_UIInterface.UpdateSlicerPosition((int)this.m_axis, (int)p.X, (int)p.Y);
+            UpdateCursorPosition();
+            Invalidate();
+            Update();
         }
 
         internal void InitScrollBarAndLoadImage()
@@ -53,7 +71,7 @@ namespace MPR_UI
 
         void scrollBar_ValueChanged(object sender, EventArgs e)
         {
-            label1.Text = Convert.ToString(scrollBar.Value);
+            
             if (scrollBar.Value != Index)
             {
                 m_UIInterface.Scroll((int)this.m_axis, scrollBar.Value - Index);
@@ -61,15 +79,9 @@ namespace MPR_UI
             }
         }
 
-      
-        internal void LoadImage()
+
+        internal void UpdateCursorPosition()
         {
-            BitmapWrapper bmpWrapper = m_UIInterface.GetDisplayImage((int)this.m_axis);
-            Position = m_UIInterface.GetCurrentImagePosition((int)this.m_axis);
-            Index = m_UIInterface.GetCurrentImageIndex((int)this.m_axis);
-            if (Index != scrollBar.Value)
-                MessageBox.Show("Alert");
-            this.m_imagePanel.StoreBitmap = bmpWrapper.StoredBitmap;
             switch (this.m_axis)
             {
                 case Axis.AxialAxis:
@@ -106,7 +118,17 @@ namespace MPR_UI
                 default:
                     break;
             }
-            
+        }
+
+        internal void LoadImage()
+        {
+            BitmapWrapper bmpWrapper = m_UIInterface.GetDisplayImage((int)this.m_axis);
+            Position = m_UIInterface.GetCurrentImagePosition((int)this.m_axis);
+            Index = m_UIInterface.GetCurrentImageIndex((int)this.m_axis);
+            //if (Index != scrollBar.Value)
+            //    MessageBox.Show("Alert");
+            this.m_imagePanel.StoreBitmap = bmpWrapper.StoredBitmap;
+            UpdateCursorPosition();
             this.Invalidate();
             
         }
@@ -126,6 +148,11 @@ namespace MPR_UI
         {
             get { return m_index; }
             set { m_index = value; }
+        }
+
+        internal void UpdateCursor(System.Windows.Forms.Cursor cursor)
+        {
+            this.Cursor = cursor;
         }
     }
 }

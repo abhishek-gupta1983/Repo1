@@ -20,6 +20,7 @@ namespace RTViewer
 		void initFromImage(vtkSmartPointer<vtkImageData> image);
 		image GetOutputImage(Axis axis);
 		void Scroll(Axis axis, int delta);
+		void Scroll2(Axis axis, float newPosition);
 		int GetNumberOfImages(Axis axis);
 		int GetCurrentImageIndex(Axis axis);
 		double GetCurrentImagePosition(Axis axis);

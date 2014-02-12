@@ -9,10 +9,13 @@ using System.Text;
 using System.Windows.Forms;
 using ImageUtils;
 using MPR_UI.Properties;
+using MPR_VTK_BRIDGE;
 namespace MPR_UI
 {
     public partial class ImagePanel2 : Control
     {
+        public delegate void MPRCursorTranslated(Point p);
+        public event MPRCursorTranslated EVT_MPRCursorTranslated;
         private Bitmap m_storedBitmap;
         private struct MPRCursor
         {
@@ -22,9 +25,15 @@ namespace MPR_UI
 
         private MPRCursor m_mprCursor;
         private CoordinateMapping m_coordinateMapping;
-        private Point mousePosition;
-        private Point mousePosition2;
         private PointF cursorPosition;
+        private GraphicsPath cursorPath;
+        private Point lastMousePosition;
+        private Point lastMousePositionORG;
+        private bool imageChanged;
+        // testing
+        GraphicsPath objectPath;
+        Point objectLocation;
+        bool objectSelected;
 
         public ImagePanel2()
         {
@@ -35,11 +44,22 @@ namespace MPR_UI
             BorderSize = 2;
             currentZoomFactor = 1.0F;
             originalZoomFactor = 1.0F;
-            
+            lastMousePosition = new Point(0, 0);
+
             // initialize MPR cursor
             this.m_mprCursor = new MPRCursor();
             // initial coordinate system mapping
             this.m_coordinateMapping = new CoordinateMapping();
+            // cursor path
+            cursorPath = new GraphicsPath();
+            cursorPath.Reset();
+
+            // testing
+            objectPath = new GraphicsPath();
+            objectLocation = new Point(0, 0);
+            objectPath.Reset();
+            objectPath.AddEllipse(objectLocation.X - 5.0F, objectLocation.Y - 5.0F, 10.0F, 10.0F);
+            objectPath.CloseFigure();
 
             // Set few control option.
             SetStyle(ControlStyles.UserPaint, true);
@@ -114,38 +134,75 @@ namespace MPR_UI
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            mousePosition = getOriginalCoords(new Point(e.X, e.Y));
-            mousePosition2 = getDicomCoords(new Point(e.X, e.Y));
             base.OnMouseDown(e);
-        }
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                if (objectPath.GetBounds().Contains(e.Location))
+                {
+                    objectSelected = true;
+                }
+                objectLocation = e.Location;
+            }
 
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                if (cursorPath.GetBounds().Contains(e.Location))
+                {
+                    MPRCursorSelected = true;
+                }
+                else
+                {
+                    MPRCursorSelected = false;
+                }
+            }
+            
+            // update last mouse position
+            this.lastMousePositionORG = new Point(e.X, e.Y) ;
+            this.lastMousePosition = this.GetOriginalCoords(e.Location);
+           
+        }
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            MPRCursorSelected = false;
+            
+            // testing
+            objectSelected = false;
+
+            // update last mouse position
+            this.lastMousePositionORG = new Point(e.X, e.Y);
+            this.lastMousePosition = this.GetOriginalCoords(e.Location);
+            
+        }
+        
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            mousePosition2 = getDicomCoords(new Point(e.X, e.Y));
-            mousePosition = getOriginalCoords(new Point(e.X, e.Y));
             base.OnMouseMove(e);
+            if (MPRCursorSelected == true) 
+            {
+                Point p = this.GetOriginalCoords(new Point(e.X, e.Y));
+                EVT_MPRCursorTranslated(p);
+            }
+
+            if (objectSelected == true)
+            {
+                objectLocation = e.Location;
+                objectPath.Reset();
+                objectPath.AddEllipse(objectLocation.X - 5.0F, objectLocation.Y - 5.0F, 10.0F, 10.0F);
+                objectPath.CloseFigure();
+            }
+            // update last mouse position
+            this.lastMousePositionORG = new Point(e.X, e.Y);
+            this.lastMousePosition = this.GetOriginalCoords(e.Location);
             Invalidate();
-        }
-
-        // returns co-ordinate wrt 0,0 as top-left.
-        private Point getOriginalCoords(Point p)
-        {
-            Point ret = new Point((int)((p.X / currentZoomFactor) - currentDisplayOffsetPt.X),
-                (int)((p.Y / currentZoomFactor) - currentDisplayOffsetPt.Y));
-            return this.m_coordinateMapping.GetActualPosition(ret);
-        }
-
-        private Point getDicomCoords(Point p)
-        {
-            Point ret = this.m_coordinateMapping.GetActualDisplayPosition(new Point(p.X, p.Y));
-            ret = new Point((int)(this.currentZoomFactor * (p.X + this.currentDisplayOffsetPt.X)), 
-                          (int)(this.currentZoomFactor * (p.Y + this.currentDisplayOffsetPt.Y)));
-            return ret;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             if (StoreBitmap == null) return;
+            MPR_UI_Interface.WriteLog("Handling paint event.");
+
             RectangleF srcRect = new RectangleF((e.ClipRectangle.X / currentZoomFactor) - currentDisplayOffsetPt.X,
                     (e.ClipRectangle.Y / currentZoomFactor) - currentDisplayOffsetPt.Y,
                     e.ClipRectangle.Width / currentZoomFactor, e.ClipRectangle.Height / currentZoomFactor);
@@ -154,7 +211,13 @@ namespace MPR_UI
             e.Graphics.DrawRectangle(new Pen(Color.FromArgb(255, 0, 0)), roundedRectangle);
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
             e.Graphics.DrawImage(StoreBitmap, e.ClipRectangle, srcRect, GraphicsUnit.Pixel);
+            
+            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            Pen p = new Pen(Color.Gold, 10.0F);
+            e.Graphics.FillPath(p.Brush, objectPath);
 
             Pen _pen1 = new Pen(Color.LightGoldenrodYellow, 2.0F);
             
@@ -179,35 +242,12 @@ namespace MPR_UI
                 e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 40));
             }
 
-            if (mousePosition != null)
-            {
-                StringBuilder _sb = new StringBuilder();
-                _sb.Append("X:");
-                _sb.Append(mousePosition.X);
-                _sb.Append(" Y:");
-                _sb.Append(mousePosition.Y);
-                Font _font = new Font("Verdana", 10.0F);
-                e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 50));
-            }
-            if (mousePosition2 != null)
-            {
-                StringBuilder _sb = new StringBuilder();
-                _sb.Append("X2:");
-                _sb.Append(mousePosition2.X);
-                _sb.Append(" Y2:");
-                _sb.Append(mousePosition2.Y);
-                Font _font = new Font("Verdana", 10.0F);
-                e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 70));
-            }
-
             if (cursorPosition != null)
             {
-                GraphicsPath cursorPath = new GraphicsPath();
-
+                cursorPath.Reset();
                 cursorPath.AddEllipse(cursorPosition.X - 5.0F, cursorPosition.Y - 5.0F, 10.0F, 10.0F);
-
                 cursorPath.CloseFigure();
-                e.Graphics.FillPath(_pen1.Brush, cursorPath);
+                e.Graphics.FillPath(p.Brush, cursorPath);
             }
             // paint cursor
             if (this.m_mprCursor.l1 != null)
@@ -263,7 +303,7 @@ namespace MPR_UI
             PointF p1 = GetActualDisplayPosition(p);
             //p1 = new PointF((float)(this.currentZoomFactor * (p1.X + this.currentDisplayOffsetPt.X)),
             //                (float)(this.currentZoomFactor * (p1.Y + this.currentDisplayOffsetPt.Y)));
-            this.m_mprCursor.l2.P1 = new PointF(imageRect.Left,p1.Y);
+            this.m_mprCursor.l2.P1 = new PointF(imageRect.Left, p1.Y);
             this.m_mprCursor.l2.P2 = new PointF(imageRect.Right,p1.Y);
             this.m_mprCursor.l2.Axis = axis;
             cursorPosition = p1;
@@ -272,8 +312,18 @@ namespace MPR_UI
         public PointF GetActualDisplayPosition(PointF point)
         {
             PointF p = this.m_coordinateMapping.GetActualDisplayPosition(point);
-            p = new PointF((float)(this.currentZoomFactor * (p.X + this.currentDisplayOffsetPt.X)), (float)(this.currentZoomFactor * (p.Y + this.currentDisplayOffsetPt.Y)));
+            p = new PointF((float)(this.currentZoomFactor * (p.X + this.currentDisplayOffsetPt.X)), 
+                (float)(this.currentZoomFactor * (p.Y + this.currentDisplayOffsetPt.Y)));
             return p;
         }
+
+        public Point GetOriginalCoords(Point p)
+        {
+            Point ret = new Point((int)((p.X / currentZoomFactor) - currentDisplayOffsetPt.X),
+                (int)((p.Y / currentZoomFactor) - currentDisplayOffsetPt.Y));
+            return this.m_coordinateMapping.GetActualPosition(ret);
+        }
+
+        public bool MPRCursorSelected { get; set; }
     }
 }

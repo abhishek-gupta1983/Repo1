@@ -307,6 +307,42 @@ void MPR::Scroll(Axis axis, int delta)
 	}
 }
 
+void MPR::Scroll2(Axis axis, float newPosition)
+{
+	double origin[3];
+	d->GetInput()->GetOrigin(origin);
+	double spacing[3];
+	d->GetInput()->GetSpacing(spacing);
+
+	double currentPos = d->m_slicers[axis]->GetSlicerPosition();
+	int delta = 0;
+	switch (axis)
+	{
+		case RTViewer::AxialAxis:
+		{
+			newPosition += origin[2];
+			delta = (newPosition - currentPos) / spacing[2];
+		}
+			break;
+		case RTViewer::CoronalAxis:
+		{
+			newPosition += origin[1];
+			delta = (newPosition - currentPos) / spacing[1];
+		}
+			break;
+		case RTViewer::SagittalAxis:
+		{
+			newPosition += origin[0];
+			delta = (newPosition - currentPos) / spacing[0];
+		}
+			break;
+		default:
+			break;
+	}
+	this->Scroll(axis, delta);
+	RAD_LOG_INFO("Delta is:" << delta);
+	return;
+}
 int MPR::GetNumberOfImages(Axis axis)
 {
 	int numberOfImages = 0;
@@ -353,9 +389,7 @@ double MPR::GetCurrentImagePositionRelativeToOrigin(Axis axis)
 	{
 		if (i == axis)
 		{
-			
 			pos = d->m_slicers[i]->GetSlicerPosition();
-
 		}
 	}
 	double origin[3];

@@ -12,11 +12,12 @@ using MPR_VTK_BRIDGE;
 
 namespace MPR_UI
 {
+    [System.Runtime.InteropServices.GuidAttribute("063C04C5-9EA1-45A2-AE52-2AEB854437CE")]
     public partial class MainForm : Form
     {
         private ImageControl axialImage;
-        private ImageControl sagittalImage;
         private ImageControl coronalImage;
+        private ImageControl sagittalImage;
         public MainForm()
         {
             InitializeComponent();

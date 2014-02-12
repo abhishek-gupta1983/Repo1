@@ -93,3 +93,62 @@ double MPR_UI_Interface::GetCurrentImagePositionRelativeToOrigin(int axis)
 {
 	return this->m_mpr->GetCurrentImagePositionRelativeToOrigin((Axis)axis);
 }
+
+void MPR_UI_Interface::UpdateSlicerPosition(int axis, float x, float y)
+{
+	switch ((Axis)axis)
+	{
+		case AxialAxis:
+		{
+			this->m_mpr->Scroll2(Axis::SagittalAxis, x);
+			this->m_mpr->Scroll2(Axis::CoronalAxis, y);
+
+			BitmapWrapper^ sagittal_bmp = GetDisplayImage((int)Axis::SagittalAxis);
+			BitmapWrapper^ coronal_bmp = GetDisplayImage((int)Axis::CoronalAxis);
+			if (m_updateImage != nullptr)
+			{
+				EVT_UpdateImage(sagittal_bmp, Axis::SagittalAxis, 0, 0);
+				EVT_UpdateImage(coronal_bmp, Axis::CoronalAxis, 0, 0);
+			}
+		}
+			break;
+		case SagittalAxis:
+		{
+			this->m_mpr->Scroll2(Axis::CoronalAxis, x);
+			this->m_mpr->Scroll2(Axis::AxialAxis, y);
+
+			BitmapWrapper^ axial_bmp = GetDisplayImage((int)Axis::AxialAxis);
+			BitmapWrapper^ coronal_bmp = GetDisplayImage((int)Axis::CoronalAxis);
+			if (m_updateImage != nullptr)
+			{
+				EVT_UpdateImage(axial_bmp, Axis::AxialAxis, 0, 0);
+				EVT_UpdateImage(coronal_bmp, Axis::CoronalAxis, 0, 0);
+			}
+		}
+			break;
+		case CoronalAxis:
+		{
+			this->m_mpr->Scroll2(Axis::SagittalAxis , x);
+			this->m_mpr->Scroll2(Axis::AxialAxis, y);
+
+			BitmapWrapper^ sagittal_bmp = GetDisplayImage((int)Axis::SagittalAxis);
+			BitmapWrapper^ axial_bmp = GetDisplayImage((int)Axis::AxialAxis);
+			if (m_updateImage != nullptr)
+			{
+				EVT_UpdateImage(sagittal_bmp, Axis::SagittalAxis, 0, 0);
+				EVT_UpdateImage(axial_bmp, Axis::AxialAxis, 0, 0);
+			}
+		}
+			break;
+		default:
+			break;
+	}
+}
+
+
+// static methods
+void MPR_UI_Interface::WriteLog(String^ msg)
+{
+	const char* m = convert_to_const_charPtr(msg);
+	RAD_LOG_INFO("UI:"<<m);
+}
