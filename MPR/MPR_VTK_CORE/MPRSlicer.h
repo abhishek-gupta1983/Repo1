@@ -3,9 +3,9 @@
 #include "enums.h"
 #include "vtkSmartPointer.h"
 #include "vtkImageData.h"
-#include "vtkImageMapToWindowLevelColors.h"
 class vtkMatrix4x4;
 class vtkImageReslice;
+
 namespace RTViewer
 {
 	// forward declaration;

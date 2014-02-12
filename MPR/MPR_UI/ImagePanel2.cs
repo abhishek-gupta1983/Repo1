@@ -29,7 +29,6 @@ namespace MPR_UI
         private GraphicsPath cursorPath;
         private Point lastMousePosition;
         private Point lastMousePositionORG;
-        private bool imageChanged;
         // testing
         GraphicsPath objectPath;
         Point objectLocation;

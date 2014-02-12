@@ -11,6 +11,8 @@
 #include "vtkMatrix4x4.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
+#include "vtkTransform.h"
+
 using namespace RTViewer;
 
 #define __FILENAME__ "MPRSlicer.cpp"
@@ -45,12 +47,32 @@ void MPRSlicer::InitSlicer()
 			this->m_resliceMatrix->DeepCopy(axialElements);
 			break;
 		case SagittalAxis:
+		{
 			this->m_resliceMatrix->DeepCopy(sagittalElements);
+			// reorient reslice matrix to show image up-right and in correct orientation
+			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+			transform->SetMatrix(this->m_resliceMatrix);
+			transform->RotateZ(180);
+			transform->RotateY(180);
+			transform->Update();
+			// reorientation done. Now set new reslice matrix back.
+			this->m_resliceMatrix->DeepCopy(transform->GetMatrix());
+		}
 			break;
 		case CoronalAxis:
+		{
 			this->m_resliceMatrix->DeepCopy(coronalElements);
+			// reorient reslice matrix to show image up-right and in correct orientation
+			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+			transform->SetMatrix(this->m_resliceMatrix);
+			transform->RotateX(180);
+			transform->Update();
+			// reorientation done. Now set new reslice matrix back.
+			this->m_resliceMatrix->DeepCopy(transform->GetMatrix());
+		}
 			break;
 	}
+
 
 	this->m_reslice->SetResliceAxes(this->m_resliceMatrix);
 	this->m_reslice->InterpolateOff();
@@ -79,6 +101,7 @@ void MPRSlicer::SetReslicePosition(double point[3])
 	this->m_reslice->GetResliceAxes()->SetElement(0,3,point[0]);
 	this->m_reslice->GetResliceAxes()->SetElement(1,3,point[1]);
 	this->m_reslice->GetResliceAxes()->SetElement(2,3,point[2]);
+	this->m_resliceMatrix->Modified();
 }
 
 image MPRSlicer::GetOutputImage()
@@ -109,6 +132,7 @@ image MPRSlicer::GetOutputImage()
 			}
 			break;
 	}
+
 	this->m_reslice->SetResliceAxes(m_resliceMatrix);
 	this->m_reslice->SetInputData(this->m_inputImage);
 	this->m_reslice->SetOutputDimensionality(2); 
