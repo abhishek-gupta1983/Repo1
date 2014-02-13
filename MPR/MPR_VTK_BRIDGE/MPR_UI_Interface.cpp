@@ -145,6 +145,23 @@ void MPR_UI_Interface::UpdateSlicerPosition(int axis, float x, float y)
 	}
 }
 
+String^ MPR_UI_Interface::GetOrientationMarkerLeft(int axis)
+{
+	return convert_to_managed_string(this->m_mpr->GetOrientationMarkerLeft((Axis)axis));
+}
+String^ MPR_UI_Interface::GetOrientationMarkerRight(int axis)
+{
+	return convert_to_managed_string(this->m_mpr->GetOrientationMarkerRight((Axis)axis));
+}
+String^ MPR_UI_Interface::GetOrientationMarkerTop(int axis)
+{
+	return convert_to_managed_string(this->m_mpr->GetOrientationMarkerTop((Axis)axis));
+}
+String^ MPR_UI_Interface::GetOrientationMarkerBottom(int axis)
+{
+	return convert_to_managed_string(this->m_mpr->GetOrientationMarkerBottom((Axis)axis));
+}
+
 
 // static methods
 void MPR_UI_Interface::WriteLog(String^ msg)

@@ -20,6 +20,7 @@ namespace MPR_UI
         private double m_position;
         private int m_index;
 
+        
         public ImageControl()
         {
             InitializeComponent();
@@ -66,7 +67,14 @@ namespace MPR_UI
             this.scrollBar.Value = m_UIInterface.GetCurrentImageIndex((int)this.m_axis);
             // Init scroll bar event
             this.scrollBar.ValueChanged += scrollBar_ValueChanged;
+
+            // ORIENTATION MARKERS
+            OrientationMarkerLeft = m_UIInterface.GetOrientationMarkerLeft((int)this.m_axis);
+            OrientationMarkerRight = m_UIInterface.GetOrientationMarkerRight((int)this.m_axis);
+            OrientationMarkerTop = m_UIInterface.GetOrientationMarkerTop((int)this.m_axis);
+            OrientationMarkerBottom = m_UIInterface.GetOrientationMarkerBottom((int)this.m_axis);
             LoadImage();
+            
         }
 
         void scrollBar_ValueChanged(object sender, EventArgs e)
@@ -149,6 +157,11 @@ namespace MPR_UI
             get { return m_index; }
             set { m_index = value; }
         }
+
+        internal string OrientationMarkerLeft { set; get; }
+        internal string OrientationMarkerRight { set; get; }
+        internal string OrientationMarkerBottom { set; get; }
+        internal string OrientationMarkerTop { set; get; }
 
         internal void UpdateCursor(System.Windows.Forms.Cursor cursor)
         {

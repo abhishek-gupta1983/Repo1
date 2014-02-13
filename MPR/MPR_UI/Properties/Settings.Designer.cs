@@ -25,7 +25,7 @@ namespace MPR_UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\DicomDataSet\\DICOM-RT\\BHAVANA\\1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\DicomDataset-OLD\\CT\\Phienix")]
         public string DICOM_DIR {
             get {
                 return ((string)(this["DICOM_DIR"]));

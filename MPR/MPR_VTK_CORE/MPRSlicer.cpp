@@ -14,7 +14,7 @@
 #include "vtkTransform.h"
 
 using namespace RTViewer;
-
+using namespace std;
 #define __FILENAME__ "MPRSlicer.cpp"
 #undef __MODULENAME__
 #define __MODULENAME__ "MPRSlicer"
@@ -95,6 +95,7 @@ void MPRSlicer::InitSlicer()
 			break;
 	}
 	this->SetReslicePosition(m_origin);
+	this->ComputeOrientationMarkers();
 }
 void MPRSlicer::SetReslicePosition(double point[3])
 {
@@ -258,4 +259,152 @@ int MPRSlicer::GetSlicerPositionAsIndex()
 double MPRSlicer::GetSlicerPosition()
 {
 	return this->m_position;
+}
+
+//char *
+//DerivedImagePlane::getOrientation(Vector3D vector)
+//{
+//	char *orientation = new char[4];
+//	char *optr = orientation;
+//	*optr = '\0';
+//
+//	char orientationX = vector.getX() < 0 ? 'R' : 'L';
+//	char orientationY = vector.getY() < 0 ? 'A' : 'P';
+//	char orientationZ = vector.getZ() < 0 ? 'F' : 'H';
+//
+//	double absX = fabs(vector.getX());
+//	double absY = fabs(vector.getY());
+//	double absZ = fabs(vector.getZ());
+//
+//	int i;
+//	for (i = 0; i<3; ++i) {
+//		if (absX>.0001 && absX>absY && absX>absZ) {
+//			*optr++ = orientationX;
+//			absX = 0;
+//		}
+//		else if (absY>.0001 && absY>absX && absY>absZ) {
+//			*optr++ = orientationY;
+//			absY = 0;
+//		}
+//		else if (absZ>.0001 && absZ>absX && absZ>absY) {
+//			*optr++ = orientationZ;
+//			absZ = 0;
+//		}
+//		else break;
+//		*optr = '\0';
+//	}
+//	return orientation;
+//}
+
+// helper methods.
+string CalucateOrientation(double vectorX, double vectorY, double vectorZ)
+{
+	string orientation = "";
+	string orientationX = vectorX <= (double)0 ? "R" : "L";
+	string orientationY = vectorY <= (double)0 ? "A" : "P";
+	string orientationZ = vectorZ <= (double)0 ? "I" : "S";
+
+
+	double absX = abs(vectorX);
+	double absY = abs(vectorY);
+	double absZ = abs(vectorZ);
+
+	double obliquity = 0.50;
+	for (int i = 0; i<3; ++i) {
+		if (absX>obliquity && absX >= absY && absX >= absZ) {
+			orientation.append(orientationX);
+			absX = 0;
+		}
+		else if (absY>obliquity && absY >= absX && absY >= absZ) {
+			orientation.append(orientationY);
+			absY = 0;
+		}
+		else if (absZ>obliquity && absZ >= absX && absZ >= absY) {
+			orientation.append(orientationZ);
+			absZ = 0;
+		}
+		else
+			break;
+	}
+	return(orientation);
+}
+string GetOtherOrientation(string oneOrientation)
+{
+	string otherOrientation;
+	if (strcmp(oneOrientation.c_str(), "A") == 0)
+	{
+		otherOrientation = "P";
+	}
+	if (strcmp(oneOrientation.c_str(), "P") == 0)
+	{
+		otherOrientation = "A";
+	}
+
+	if (strcmp(oneOrientation.c_str(), "L") == 0)
+	{
+		otherOrientation = "R";
+	}
+	if (strcmp(oneOrientation.c_str(), "R") == 0)
+	{
+		otherOrientation = "L";
+	}
+
+	if (strcmp(oneOrientation.c_str(), "I") == 0)
+	{
+		otherOrientation = "S";
+	}
+	if (strcmp(oneOrientation.c_str(), "S") == 0)
+	{
+		otherOrientation = "I";
+	}
+	return otherOrientation;
+
+}
+void MPRSlicer::ComputeOrientationMarkers()
+{
+	switch (m_axis)
+	{ 
+		case AxialAxis:
+		{
+			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
+			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(0, 0),
+																resliceMatrix->GetElement(0, 1),
+																resliceMatrix->GetElement(0, 2));
+			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
+
+			this->m_orientatationMarkers_B = CalucateOrientation(resliceMatrix->GetElement(1, 0),
+																resliceMatrix->GetElement(1, 1),
+																resliceMatrix->GetElement(1, 2));
+			this->m_orientatationMarkers_T = GetOtherOrientation(this->m_orientatationMarkers_B);
+		}
+			break;
+		case SagittalAxis:
+		{
+			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
+			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(2,0),
+																 resliceMatrix->GetElement(2, 1),
+																 resliceMatrix->GetElement(2, 2));
+			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
+
+			this->m_orientatationMarkers_T = CalucateOrientation(resliceMatrix->GetElement(0, 0),
+																resliceMatrix->GetElement(0, 1),
+																resliceMatrix->GetElement(0, 2));
+			this->m_orientatationMarkers_B = GetOtherOrientation(this->m_orientatationMarkers_T);
+		}
+			break;
+		case CoronalAxis:
+		{
+			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
+			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(0, 0),
+				resliceMatrix->GetElement(0, 1),
+				resliceMatrix->GetElement(0, 2));
+			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
+
+			this->m_orientatationMarkers_B = CalucateOrientation(resliceMatrix->GetElement(1, 0),
+				resliceMatrix->GetElement(1, 1),
+				resliceMatrix->GetElement(1, 2));
+			this->m_orientatationMarkers_T = GetOtherOrientation(this->m_orientatationMarkers_B);
+		}
+			break;
+	}
 }

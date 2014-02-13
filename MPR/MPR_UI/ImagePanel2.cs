@@ -212,19 +212,20 @@ namespace MPR_UI
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             e.Graphics.DrawImage(StoreBitmap, e.ClipRectangle, srcRect, GraphicsUnit.Pixel);
-            
+
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Pen p = new Pen(Color.Gold, 10.0F);
             e.Graphics.FillPath(p.Brush, objectPath);
 
             Pen _pen1 = new Pen(Color.LightGoldenrodYellow, 2.0F);
-            
+            Pen _pen2 = new Pen(Color.ForestGreen, 2.0F);
+            Font _font = new Font("Verdana", 10.0F);
             if (this.Parent.Parent.Name.CompareTo("ImageControl") == 0)
-            { 
+            {
                 var imgControl = (ImageControl)this.Parent.Parent;
                 int idx = imgControl.GetScrollbarValue();
-                Font _font = new Font("Verdana", 10.0F);
+
                 StringBuilder _sb = new StringBuilder();
                 _sb.Append("Scroll Pos#");
                 _sb.Append(idx);
@@ -258,6 +259,15 @@ namespace MPR_UI
             {
                 e.Graphics.DrawLine(this.m_mprCursor.l2.DisplayPen,
                     this.m_mprCursor.l2.P1.X, this.m_mprCursor.l2.P1.Y, this.m_mprCursor.l2.P2.X, this.m_mprCursor.l2.P2.Y);
+            }
+
+            // paint side marker
+            {
+                var imgControl = (ImageControl)this.Parent.Parent;
+                e.Graphics.DrawString(imgControl.OrientationMarkerLeft, _font, _pen2.Brush, new PointF(this.Width - 20, this.Height / 2));
+                e.Graphics.DrawString(imgControl.OrientationMarkerRight, _font, _pen2.Brush, new PointF(0, this.Height / 2));
+                e.Graphics.DrawString(imgControl.OrientationMarkerTop, _font, _pen2.Brush, new PointF(this.Width / 2, 0));
+                e.Graphics.DrawString(imgControl.OrientationMarkerBottom, _font, _pen2.Brush, new PointF(this.Width / 2, this.Height - 20));
             }
             base.OnPaint(e);
         }

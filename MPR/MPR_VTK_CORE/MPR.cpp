@@ -274,6 +274,7 @@ void MPR::initFromImage(vtkSmartPointer<vtkImageData> image)
 		MPRSlicer* slicer = new MPRSlicer((Axis)i);
 		slicer->SetInput(image);
 		slicer->InitSlicer();
+
 		d->m_slicers[i] = slicer;
 	}
 
@@ -440,4 +441,51 @@ void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)
 		default:
 			break;
 	}
+}
+
+
+string MPR::GetOrientationMarkerLeft(Axis axis)
+{
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			return d->m_slicers[i]->GetOrientationMarkers_L();
+		}
+	}
+	return "";
+}
+
+string MPR::GetOrientationMarkerRight(Axis axis)
+{
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			return d->m_slicers[i]->GetOrientationMarkers_R();
+		}
+	}
+	return "";
+}
+string MPR::GetOrientationMarkerTop(Axis axis)
+{
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			return d->m_slicers[i]->GetOrientationMarkers_T();
+		}
+	}
+	return "";
+}
+string MPR::GetOrientationMarkerBottom(Axis axis)
+{
+	for (int i = 0; i<3; i++)
+	{
+		if (i == axis)
+		{
+			return d->m_slicers[i]->GetOrientationMarkers_B();
+		}
+	}
+	return "";
 }

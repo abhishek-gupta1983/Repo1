@@ -26,6 +26,10 @@ namespace RTViewer
 		double GetCurrentImagePosition(Axis axis);
 		double GetCurrentImagePositionRelativeToOrigin(Axis axis);
 		void GetOutputImageDisplayDimensions(Axis axis, int& width, int& height);
+		string GetOrientationMarkerLeft(Axis axis);
+		string GetOrientationMarkerRight(Axis axis);
+		string GetOrientationMarkerTop(Axis axis);
+		string GetOrientationMarkerBottom(Axis axis);
 		
 	private:
 		MPRData* d;
