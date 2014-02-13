@@ -79,12 +79,10 @@
   <ItemGroup>
     <ClInclude Include="enums.h" />
     <ClInclude Include="MPR.h" />
-    <ClInclude Include="MPRCursror.h" />
     <ClInclude Include="MPRSlicer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MPR.cpp" />
-    <ClCompile Include="MPRCursror.cpp" />
     <ClCompile Include="MPRSlicer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
