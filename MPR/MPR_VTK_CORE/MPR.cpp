@@ -12,6 +12,7 @@
 
 // VTK includes
 #include "vtkImageData.h"
+#include "vtkMatrix4x4.h"
 #include "vtkSmartPointer.h"
 #include "vtkDicomImageReader.h"
 #include "vtkPointData.h"
@@ -38,7 +39,10 @@ namespace RTViewer
 		
 	public:
 		MPRSlicer* m_slicers[3];
-		
+		double m_lastImagePosition[3];
+		double m_imageOrientation[6];
+		double m_normal[3];
+		vtkSmartPointer<vtkMatrix4x4> m_initOrient;
 	private:
 		
 	public:
@@ -55,7 +59,8 @@ MPR::MPR(void)
 {
 	
 	d = new MPRData();
-	
+	d->m_initOrient = vtkSmartPointer<vtkMatrix4x4>::New();
+	d->m_initOrient->Identity();
 
 }
 
@@ -107,7 +112,7 @@ void MPR::initFromDir1(vector<string> dicomFiles)
 		
 		const char* dicomFile = rit->second.c_str();
 		RadRTDicomInterface* pDicom = new RTDcmtkDicomInterface(dicomFile);
-		if (j == 0)
+		if (j == sortedDicomFiles.size()-1)
 		{
 			string imagePosition = string(pDicom->Get_IMAGE_POSITION());
 			vector<string> _imgPosition;
@@ -117,6 +122,48 @@ void MPR::initFromDir1(vector<string> dicomFiles)
 				firstImagePosition[i] = convert_to_double(_imgPosition.at(i).c_str());
 			}
 
+		}
+		if (j == 0)
+		{
+			string imagePosition = string(pDicom->Get_IMAGE_POSITION());
+			vector<string> _imgPosition;
+			tokenize(imagePosition, _imgPosition, "\\", true);
+			for (int i = 0; i<_imgPosition.size(); i++)
+			{
+				d->m_lastImagePosition[i] = convert_to_double(_imgPosition.at(i).c_str());
+				firstImagePosition[i] = convert_to_double(_imgPosition.at(i).c_str());
+			}
+			
+			string imageOrientation = string(pDicom->Get_IMAGE_ORIENTATION());
+			/*m_normal[3] = {0,0,0};
+			m_imageOrientation[6] = {0,0,0,0,0,0};*/
+
+			vector<string> _imgOrient;
+			tokenize(imageOrientation, _imgOrient, "\\", true);
+			for (int i = 0; i<_imgOrient.size(); i++)
+			{
+				d->m_imageOrientation[i] = convert_to_double(_imgOrient.at(i).c_str());
+			}
+			d->m_normal[0] = (d->m_imageOrientation[1] * d->m_imageOrientation[5]) - (d->m_imageOrientation[2] * d->m_imageOrientation[4]);
+			d->m_normal[1] = (d->m_imageOrientation[0] * d->m_imageOrientation[5]) - (d->m_imageOrientation[2] * d->m_imageOrientation[3]);
+			d->m_normal[2] = (d->m_imageOrientation[0] * d->m_imageOrientation[4]) - (d->m_imageOrientation[1] * d->m_imageOrientation[3]);
+
+			double matrx[16] = { (d->m_imageOrientation[0]), (d->m_imageOrientation[1]), (d->m_imageOrientation[2]), 0,
+				(d->m_imageOrientation[3]), (d->m_imageOrientation[4]), (d->m_imageOrientation[5]), 0,
+				(d->m_normal[0]), (d->m_normal[1]), (d->m_normal[2]), 0,
+				0, 0, 0, 1 };
+
+			d->m_initOrient->Identity();
+			for (int i = 0; i<4; ++i)
+			{
+				for (int j = 0; j<4; ++j)
+				{
+					d->m_initOrient->SetElement(i, j, matrx[4 * i + j]);
+				}
+			}
+
+			d->m_initOrient->Transpose();
+			
 			if (pDicom->Get_BITS_ALLOCATED() / 8 == 1)
 			{
 				if (!strcmp(pDicom->Get_PHOTOMETRIC_INTERPRETATION(), "RGB") ||
@@ -170,7 +217,7 @@ void MPR::initFromDir1(vector<string> dicomFiles)
 			string imagePosition = string(pDicom->Get_IMAGE_POSITION());
 			vector<string> _imgPosition;
 			tokenize(imagePosition, _imgPosition, "\\", true);
-			spacing[2] = convert_to_double(_imgPosition.at(2).c_str()) - spacing[2];
+			spacing[2] = spacing[2] - convert_to_double(_imgPosition.at(2).c_str());
 		}
 
 		image pixelData = born_image();
@@ -248,6 +295,7 @@ void MPR::initFromDir1(vector<string> dicomFiles)
 	CTMPRCuboid->GetPointData()->GetScalars()->SetName("CT Cuboid");
 	double CTBounds[6];
 	CTMPRCuboid->GetBounds(CTBounds);
+	//CTMPRCuboid->SetOrigin(CTBounds[0],CTBounds[2],CTBounds);
 	RAD_LOG_CRITICAL("<abhishek> bounds:" << CTBounds[0] << ":" << CTBounds[1] << ":" << CTBounds[2] << ":" << CTBounds[3] << ":" << CTBounds[4] << ":" << CTBounds[5]);
 	this->initFromImage(CTMPRCuboid);
 
@@ -285,16 +333,18 @@ void MPR::initFromImage(vtkSmartPointer<vtkImageData> image)
 	}
 }
 
-image MPR::GetOutputImage(Axis axis)
+void* MPR::GetOutputImage(Axis axis)
 {
 	for(int i=0;i<3;i++)
 	{
-		if(i==axis)
+		if(i==(int)axis)
 		{
-			return d->m_slicers[i]->GetOutputImage();
+			RAD_LOG_INFO("i:" << i);
+			void* pData = d->m_slicers[i]->GetOutputImage();
+			return pData;
 		}
 	}
-	return ::born_image();
+	return NULL;
 }
 
 void MPR::Scroll(Axis axis, int delta)
@@ -398,13 +448,13 @@ double MPR::GetCurrentImagePositionRelativeToOrigin(Axis axis)
 	switch (axis)
 	{
 		case RTViewer::AxialAxis:
-			pos -= origin[2];
+			pos -= d->m_lastImagePosition[2];
 			break;
 		case RTViewer::CoronalAxis:
-			pos -= origin[1];
+			pos -= d->m_lastImagePosition[1];
 			break;
 		case RTViewer::SagittalAxis:
-			pos -= origin[0];
+			pos -= d->m_lastImagePosition[0];
 			break;
 		default:
 			break;
@@ -416,6 +466,9 @@ void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)
 {
 	double spacing[3] = { 0, 0, 0 };
 	d->GetInput()->GetSpacing(spacing);
+	spacing[0] = fabs(spacing[0]);
+	spacing[1] = fabs(spacing[1]);
+	spacing[2] = fabs(spacing[2]);
 	int dim[3] = { 0, 0, 0 };
 	d->GetInput()->GetDimensions(dim);
 	switch (axis)

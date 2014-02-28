@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using MPR_VTK_BRIDGE;
 using ImageUtils;
 using System.Threading;
+using System.Reflection;
 
 namespace MPR_UI
 {
@@ -20,7 +21,7 @@ namespace MPR_UI
         private double m_position;
         private int m_index;
 
-        
+
         public ImageControl()
         {
             InitializeComponent();
@@ -65,9 +66,11 @@ namespace MPR_UI
             this.scrollBar.SmallChange = 1;
             this.scrollBar.LargeChange = 1;
             this.scrollBar.Value = m_UIInterface.GetCurrentImageIndex((int)this.m_axis);
+
             // Init scroll bar event
             this.scrollBar.ValueChanged += scrollBar_ValueChanged;
 
+            
             // ORIENTATION MARKERS
             OrientationMarkerLeft = m_UIInterface.GetOrientationMarkerLeft((int)this.m_axis);
             OrientationMarkerRight = m_UIInterface.GetOrientationMarkerRight((int)this.m_axis);
@@ -77,9 +80,10 @@ namespace MPR_UI
             
         }
 
+        
         void scrollBar_ValueChanged(object sender, EventArgs e)
         {
-            
+
             if (scrollBar.Value != Index)
             {
                 m_UIInterface.Scroll((int)this.m_axis, scrollBar.Value - Index);

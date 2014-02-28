@@ -25,8 +25,7 @@ MPRSlicer::MPRSlicer(Axis axis)
 	this->m_position = 0;
 	this->m_inputImage = NULL;
 	this->displayData = NULL;
-	this->displayImage = ::born_image();
-	this->displayImage.data = displayData;
+	
 }
 
 MPRSlicer::~MPRSlicer(void)
@@ -44,7 +43,13 @@ void MPRSlicer::InitSlicer()
 	switch (this->m_axis)
 	{
 		case AxialAxis:
+		{
 			this->m_resliceMatrix->DeepCopy(axialElements);
+			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+			transform->SetMatrix(this->m_resliceMatrix);
+			transform->Update();
+			this->m_resliceMatrix->DeepCopy(transform->GetMatrix());
+		}
 			break;
 		case SagittalAxis:
 		{
@@ -52,8 +57,8 @@ void MPRSlicer::InitSlicer()
 			// reorient reslice matrix to show image up-right and in correct orientation
 			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
 			transform->SetMatrix(this->m_resliceMatrix);
-			transform->RotateZ(180);
-			transform->RotateY(180);
+			//transform->RotateZ(180);
+			//transform->RotateY(180);
 			transform->Update();
 			// reorientation done. Now set new reslice matrix back.
 			this->m_resliceMatrix->DeepCopy(transform->GetMatrix());
@@ -65,7 +70,7 @@ void MPRSlicer::InitSlicer()
 			// reorient reslice matrix to show image up-right and in correct orientation
 			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
 			transform->SetMatrix(this->m_resliceMatrix);
-			transform->RotateX(180);
+			//transform->RotateX(180);
 			transform->Update();
 			// reorientation done. Now set new reslice matrix back.
 			this->m_resliceMatrix->DeepCopy(transform->GetMatrix());
@@ -82,11 +87,11 @@ void MPRSlicer::InitSlicer()
 	this->m_inputImage->GetOrigin(m_origin);
 	switch (this->m_axis)
 	{
-		case CoronalAxis:
-			this->m_position = m_origin[1];
-			break;
 		case AxialAxis:
 			this->m_position = m_origin[2];
+			break;
+		case CoronalAxis:
+			this->m_position = m_origin[1];
 			break;
 		case SagittalAxis:
 			this->m_position = m_origin[0];
@@ -105,31 +110,31 @@ void MPRSlicer::SetReslicePosition(double point[3])
 	this->m_resliceMatrix->Modified();
 }
 
-image MPRSlicer::GetOutputImage()
+void* MPRSlicer::GetOutputImage()
 {
 	switch(this->m_axis)
 	{
 		case AxialAxis:
 			{
-				m_resliceMatrix->SetElement(0, 3, 0); 
-				m_resliceMatrix->SetElement(1, 3, 0); 
-				m_resliceMatrix->SetElement(2, 3, m_position); 
+				this->m_resliceMatrix->SetElement(0, 3, 0); 
+				this->m_resliceMatrix->SetElement(1, 3, 0);
+				this->m_resliceMatrix->SetElement(2, 3, m_position);
 			}
 			break;
 
 		case CoronalAxis:
 			{
-				m_resliceMatrix->SetElement(0, 3, 0); 
-				m_resliceMatrix->SetElement(1, 3, m_position); 
-				m_resliceMatrix->SetElement(2, 3, 0); 
+			this->m_resliceMatrix->SetElement(0, 3, 0);
+			this->m_resliceMatrix->SetElement(1, 3, m_position);
+			this->m_resliceMatrix->SetElement(2, 3, 0);
 			}
 			break;
 
 		case SagittalAxis:
 			{
-				m_resliceMatrix->SetElement(0, 3, m_position); 
-				m_resliceMatrix->SetElement(1, 3, 0); 
-				m_resliceMatrix->SetElement(2, 3, 0); 
+			this->m_resliceMatrix->SetElement(0, 3, m_position);
+			this->m_resliceMatrix->SetElement(1, 3, 0);
+			this->m_resliceMatrix->SetElement(2, 3, 0);
 			}
 			break;
 	}
@@ -149,7 +154,7 @@ image MPRSlicer::GetOutputImage()
 		// Catch hold of arrays
 		vtkDataArray* inScalars = this->m_outputImage->GetPointData()->GetScalars();
 
-		image in_dcm = ::born_image();
+		image in_dcm = born_image();
 		// Perform Window Level and Window width computations
 		in_dcm.width = outDim[0];
 		in_dcm.height = outDim[1];
@@ -171,6 +176,8 @@ image MPRSlicer::GetOutputImage()
 		}
 		in_dcm.data = inScalars->GetVoidPointer(0);
 
+		image displayImage = ::born_image();
+		displayImage.data = displayData;
 		displayImage.width = in_dcm.width;
 		displayImage.height = in_dcm.height;
 		displayImage.size = in_dcm.size;
@@ -183,7 +190,7 @@ image MPRSlicer::GetOutputImage()
 		this->displayData = rad_get_memory(displayImage.height*displayImage.width*rad_sizeof(displayImage.type));
 		displayImage.data = this->displayData;
 
-		::voi_lut_transform_image_fast(
+		voi_lut_transform_image_fast(
 			displayImage,
 			in_dcm,
 			400,
@@ -194,7 +201,7 @@ image MPRSlicer::GetOutputImage()
 
 	}
 
-	return displayImage;
+	return this->displayData;
 }
 
 void MPRSlicer::Scroll(int delta)
@@ -207,10 +214,10 @@ void MPRSlicer::Scroll(int delta)
 		this->m_position += delta*m_spacing[2];
 		break;
 	case CoronalAxis:
-		this->m_position += delta*m_spacing[0];
+		this->m_position += delta*m_spacing[1];
 		break;
 	case SagittalAxis:
-		this->m_position += delta*m_spacing[1];
+		this->m_position += delta*m_spacing[0];
 	}
 	RAD_LOG_INFO("New position:" << this->m_position);
 	return;
@@ -225,10 +232,10 @@ int MPRSlicer::GetNumberOfImages()
 			num = this->m_dimension[2];
 			break;
 		case CoronalAxis:
-			num = this->m_dimension[0];
+			num = this->m_dimension[1];
 			break;
 		case SagittalAxis:
-			num = this->m_dimension[1];
+			num = this->m_dimension[0];
 			break;
 		default:
 			break;
@@ -245,10 +252,10 @@ int MPRSlicer::GetSlicerPositionAsIndex()
 			idx = this->m_spacing[2]==0 ? 0 : (this->m_position - this->m_origin[2])/this->m_spacing[2];
 			break;
 		case CoronalAxis:
-			idx = this->m_spacing[0] == 0 ? 0 : (this->m_position - this->m_origin[0]) / this->m_spacing[0];
+			idx = this->m_spacing[0] == 0 ? 0 : (this->m_position - this->m_origin[1]) / this->m_spacing[1];
 			break;
 		case SagittalAxis:
-			idx = this->m_spacing[1] == 0 ? 0 : (this->m_position - this->m_origin[1]) / this->m_spacing[1];
+			idx = this->m_spacing[1] == 0 ? 0 : (this->m_position - this->m_origin[0]) / this->m_spacing[0];
 			break;
 		default:
 			break;
@@ -362,49 +369,13 @@ string GetOtherOrientation(string oneOrientation)
 }
 void MPRSlicer::ComputeOrientationMarkers()
 {
-	switch (m_axis)
-	{ 
-		case AxialAxis:
-		{
-			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
-			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(0, 0),
-																resliceMatrix->GetElement(0, 1),
-																resliceMatrix->GetElement(0, 2));
-			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
+	double x[3] = { 0, 0, 0 };
+	double y[3] = { 0, 0, 0 };
+	double z[3] = { 0, 0, 0 };
+	this->m_reslice->GetResliceAxesDirectionCosines(x, y, z);
 
-			this->m_orientatationMarkers_B = CalucateOrientation(resliceMatrix->GetElement(1, 0),
-																resliceMatrix->GetElement(1, 1),
-																resliceMatrix->GetElement(1, 2));
-			this->m_orientatationMarkers_T = GetOtherOrientation(this->m_orientatationMarkers_B);
-		}
-			break;
-		case SagittalAxis:
-		{
-			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
-			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(2,0),
-																 resliceMatrix->GetElement(2, 1),
-																 resliceMatrix->GetElement(2, 2));
-			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
-
-			this->m_orientatationMarkers_T = CalucateOrientation(resliceMatrix->GetElement(0, 0),
-																resliceMatrix->GetElement(0, 1),
-																resliceMatrix->GetElement(0, 2));
-			this->m_orientatationMarkers_B = GetOtherOrientation(this->m_orientatationMarkers_T);
-		}
-			break;
-		case CoronalAxis:
-		{
-			vtkMatrix4x4* resliceMatrix = this->m_reslice->GetResliceAxes();
-			this->m_orientatationMarkers_L = CalucateOrientation(resliceMatrix->GetElement(0, 0),
-				resliceMatrix->GetElement(0, 1),
-				resliceMatrix->GetElement(0, 2));
-			this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
-
-			this->m_orientatationMarkers_B = CalucateOrientation(resliceMatrix->GetElement(1, 0),
-				resliceMatrix->GetElement(1, 1),
-				resliceMatrix->GetElement(1, 2));
-			this->m_orientatationMarkers_T = GetOtherOrientation(this->m_orientatationMarkers_B);
-		}
-			break;
-	}
+	this->m_orientatationMarkers_L = CalucateOrientation(x[0], x[1], x[2]);
+	this->m_orientatationMarkers_R = GetOtherOrientation(this->m_orientatationMarkers_L);
+	this->m_orientatationMarkers_B = CalucateOrientation(y[0], y[1], y[2]);
+	this->m_orientatationMarkers_T = GetOtherOrientation(this->m_orientatationMarkers_B);
 }

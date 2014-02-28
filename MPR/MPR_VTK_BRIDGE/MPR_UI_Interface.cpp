@@ -61,9 +61,9 @@ void MPR_UI_Interface::InitMPR(String^ path)
 BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
 {
 
-	image displayImage = this->m_mpr->GetOutputImage((Axis)axis);
+	void* displayImage = this->m_mpr->GetOutputImage((Axis)axis);
 	
-	BitmapWrapper^ bmp = gcnew BitmapWrapper(displayImage.data, displayImage.width, displayImage.height, "MONOCHROME");
+	BitmapWrapper^ bmp = gcnew BitmapWrapper(displayImage, 512, 512, "MONOCHROME");
 	int newWidth, newHeight;
 	this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
 	bmp->Resize(newWidth, newHeight);

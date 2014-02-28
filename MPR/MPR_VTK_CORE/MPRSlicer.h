@@ -28,7 +28,7 @@ namespace RTViewer
 			void InitSlicer();
 			void SetResliceMatrix(vtkSmartPointer<vtkMatrix4x4> matrix){this->m_resliceMatrix = matrix;}
 			void SetReslicePosition(double point[3]);
-			image GetOutputImage();
+			void* GetOutputImage();
 			void Scroll(int delta);
 			int GetNumberOfImages();
 			int GetSlicerPositionAsIndex();
@@ -56,7 +56,6 @@ namespace RTViewer
 			int m_dimension[3];
 			double m_origin[3];
 			void* displayData;
-			image displayImage;
 
 		friend class MPR;
 	};

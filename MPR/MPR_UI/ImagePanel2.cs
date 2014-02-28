@@ -334,5 +334,9 @@ namespace MPR_UI
         }
 
         public bool MPRCursorSelected { get; set; }
+
+        public double XPixelSpacing { get; set; }
+
+        public double YPixelSpacing { get; set; }
     }
 }
