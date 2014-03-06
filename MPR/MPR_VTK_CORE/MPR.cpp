@@ -179,8 +179,8 @@ void MPR::initFromDir1(vector<string> dicomFiles)
 				else
 					dicomDataType = TYPE_S16Data;
 			}
-			dimensions[0] = pDicom->Get_ROW();
-			dimensions[1] = pDicom->Get_COLOUMN();
+			dimensions[0] = pDicom->Get_COLOUMN();
+			dimensions[1] = pDicom->Get_ROW();
 			dimensions[2] = dicomFiles.size();
 			dicomDataSize = dimensions[0] * dimensions[1] * dimensions[2];
 			dicomSliceSize = dimensions[0] * dimensions[1];
@@ -333,18 +333,17 @@ void MPR::initFromImage(vtkSmartPointer<vtkImageData> image)
 	}
 }
 
-void* MPR::GetOutputImage(Axis axis)
+image MPR::GetOutputImage(Axis axis)
 {
 	for(int i=0;i<3;i++)
 	{
 		if(i==(int)axis)
 		{
 			RAD_LOG_INFO("i:" << i);
-			void* pData = d->m_slicers[i]->GetOutputImage();
-			return pData;
+			return d->m_slicers[i]->GetOutputImage();
 		}
 	}
-	return NULL;
+	return ::born_image();
 }
 
 void MPR::Scroll(Axis axis, int delta)
@@ -360,6 +359,7 @@ void MPR::Scroll(Axis axis, int delta)
 
 void MPR::Scroll2(Axis axis, float newPosition)
 {
+	
 	double origin[3];
 	d->GetInput()->GetOrigin(origin);
 	double spacing[3];
@@ -369,19 +369,23 @@ void MPR::Scroll2(Axis axis, float newPosition)
 	int delta = 0;
 	switch (axis)
 	{
-		case RTViewer::AxialAxis:
+		case AxialAxis:
 		{
+			// this condition is valid for Axial plane where z-directions increases in -ve direction. 
+			// But UI gives the point in +ve 
+			if (spacing[2] < 0)
+				newPosition = newPosition*-1;
 			newPosition += origin[2];
 			delta = (newPosition - currentPos) / spacing[2];
 		}
 			break;
-		case RTViewer::CoronalAxis:
+		case CoronalAxis:
 		{
 			newPosition += origin[1];
 			delta = (newPosition - currentPos) / spacing[1];
 		}
 			break;
-		case RTViewer::SagittalAxis:
+		case SagittalAxis:
 		{
 			newPosition += origin[0];
 			delta = (newPosition - currentPos) / spacing[0];
@@ -448,18 +452,18 @@ double MPR::GetCurrentImagePositionRelativeToOrigin(Axis axis)
 	switch (axis)
 	{
 		case RTViewer::AxialAxis:
-			pos -= d->m_lastImagePosition[2];
+			pos -= origin[2];
 			break;
 		case RTViewer::CoronalAxis:
-			pos -= d->m_lastImagePosition[1];
+			pos -= origin[1];
 			break;
 		case RTViewer::SagittalAxis:
-			pos -= d->m_lastImagePosition[0];
+			pos -= origin[0];
 			break;
 		default:
 			break;
 	}
-	return pos;
+	return fabs(pos);
 }
 
 void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)

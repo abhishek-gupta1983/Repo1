@@ -25,7 +25,7 @@ MPRSlicer::MPRSlicer(Axis axis)
 	this->m_position = 0;
 	this->m_inputImage = NULL;
 	this->displayData = NULL;
-	
+	this->displayImage = ::born_image();
 }
 
 MPRSlicer::~MPRSlicer(void)
@@ -110,7 +110,7 @@ void MPRSlicer::SetReslicePosition(double point[3])
 	this->m_resliceMatrix->Modified();
 }
 
-void* MPRSlicer::GetOutputImage()
+image MPRSlicer::GetOutputImage()
 {
 	switch(this->m_axis)
 	{
@@ -176,32 +176,28 @@ void* MPRSlicer::GetOutputImage()
 		}
 		in_dcm.data = inScalars->GetVoidPointer(0);
 
-		image displayImage = ::born_image();
-		displayImage.data = displayData;
-		displayImage.width = in_dcm.width;
-		displayImage.height = in_dcm.height;
-		displayImage.size = in_dcm.size;
-		displayImage.type = TYPE_U8Data;
 		if (this->displayData != NULL)
 		{
 			rad_free_memory(this->displayData);
 			this->displayData = NULL;
 		}
+		
+		displayImage.width = in_dcm.width;
+		displayImage.height = in_dcm.height;
+		displayImage.size = in_dcm.size;
+		displayImage.type = TYPE_U8Data;
+		
 		this->displayData = rad_get_memory(displayImage.height*displayImage.width*rad_sizeof(displayImage.type));
 		displayImage.data = this->displayData;
 
-		voi_lut_transform_image_fast(
-			displayImage,
-			in_dcm,
-			400,
-			40,
+		voi_lut_transform_image_fast(displayImage,in_dcm, 385, 176,
 			0, 255,
 			1.0,
-			-1024);
+			0.0);
 
 	}
 
-	return this->displayData;
+	return displayImage;
 }
 
 void MPRSlicer::Scroll(int delta)

@@ -53,7 +53,7 @@ namespace MPR_UI
 
         private void TranslateMPRCursor(Point p)
         {
-            m_UIInterface.UpdateSlicerPosition((int)this.m_axis, (int)p.X, (int)p.Y);
+            m_UIInterface.UpdateSlicerPosition((int)this.m_axis, (float)p.X, (float)p.Y);
             UpdateCursorPosition();
             Invalidate();
             Update();

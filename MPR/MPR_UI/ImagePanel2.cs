@@ -134,6 +134,8 @@ namespace MPR_UI
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
+            //EVT_MPRCursorTranslated(new Point((int)this.m_mprCursor.l1.P1.X + 1, (int)this.m_mprCursor.l2.P1.Y + 1));
+
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 if (objectPath.GetBounds().Contains(e.Location))
@@ -178,9 +180,10 @@ namespace MPR_UI
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (MPRCursorSelected == true) 
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && MPRCursorSelected == true) 
             {
                 Point p = this.GetOriginalCoords(new Point(e.X, e.Y));
+                //Point pDiff = new Point(e.X - lastMousePositionORG.X, e.Y - lastMousePositionORG.Y);
                 EVT_MPRCursorTranslated(p);
             }
 
@@ -249,6 +252,7 @@ namespace MPR_UI
                 cursorPath.CloseFigure();
                 e.Graphics.FillPath(p.Brush, cursorPath);
             }
+            
             // paint cursor
             if (this.m_mprCursor.l1 != null)
             {

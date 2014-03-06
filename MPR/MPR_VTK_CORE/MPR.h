@@ -18,7 +18,7 @@ namespace RTViewer
 		void initFromDir(string dirPath);
 		void initFromDir1(vector<string> dicomFiles);
 		void initFromImage(vtkSmartPointer<vtkImageData> image);
-		void* GetOutputImage(Axis axis);
+		image GetOutputImage(Axis axis);
 		void Scroll(Axis axis, int delta);
 		void Scroll2(Axis axis, float newPosition);
 		int GetNumberOfImages(Axis axis);

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DICOM_DIR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">D:\DicomDataset\DICOM-RT\Bhavana\1</Value>
+      <Value Profile="(Default)">D:\Medsphere\StreamingData\1.3.12.2.1107.5.2.30.25769.30000014022817362365600000007\1.3.12.2.1107.5.2.30.25769.3.2014022819444183068214636.0.0.0</Value>
     </Setting>
     <Setting Name="AxialColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Tomato</Value>

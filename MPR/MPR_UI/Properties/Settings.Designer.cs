@@ -25,7 +25,8 @@ namespace MPR_UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\DicomDataset\\DICOM-RT\\Bhavana\\1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\Medsphere\\StreamingData\\1.3.12.2.1107.5.2.30.25769.300000140228173623656000000" +
+            "07\\1.3.12.2.1107.5.2.30.25769.3.2014022819444183068214636.0.0.0")]
         public string DICOM_DIR {
             get {
                 return ((string)(this["DICOM_DIR"]));
