@@ -1,0 +1,6 @@
+include start-Chatty.py
+include *.cfg
+include Chatty/config/*.cfg
+recursive-include Chatty/templates *.html
+recursive-include Chatty/templates *.kid
+recursive-include Chatty/static *
