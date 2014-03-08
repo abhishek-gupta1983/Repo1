@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:py="http://genshi.edgewall.org/"  xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<head>
+    <title>Meddiff: Chatty Homepage</title>
+    <script src="/static/javascript/jquery/jquery-1.11.0.min.js"/>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                Please enter a nickname:<input type="text" name="nickname" id="nickname"/>
+            </td>
+            <td>
+                <input type="button" name="signin" value="Login" onclick="login2Chat()"/>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>Select recipient:</td>
+            <td>
+                <select id="recipient" name="recipient">
+                    <option value="Select">Select</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Enter message:<input type="text" name="message" id="message"/>
+            </td>
+            <td>
+                <input type="button" name="send" value="send" onclick="sendMessage()"/>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td id="recievedMessages">
+                
+            </td>
+        </tr>
+    </table>
+</body>
+<head>
+    <script type="text/javascript">
+        <!--
+            function login2Chat(){
+                $.post("/SignIn2Chat",{nickname:document.getElementById("nickname").value})
+                .done(function(data){
+                    //alert(data);
+                    GetSignedInUsers();
+                    GetMyMessages();
+                    });
+            }
+            
+            function GetSignedInUsers() {
+                $.get("/GetSignedinUsers")
+                .done(function(data){
+                    //alert(data);
+                    var users = data.users
+                    $.each(users, function (i, user) {
+                        if (user != document.getElementById("nickname").value) {
+                            $('#recipient').append($('<option>', { 
+                                value: user,
+                                text : user 
+                            }));
+                        }
+                    });
+                    
+                });
+            }
+            
+            
+            function GetMyMessages() {
+                $.get("/GetNextChatMsg",{nickname:document.getElementById("nickname").value})
+                .done(function(data){
+                    if (data.msg != null) {
+                        $("#recievedMessages").append("<div>"+data.msg+"</div>");
+                    }
+                    GetMyMessages();
+                });
+            }
+            
+            function sendMessage() {
+                alert(document.getElementById("recipient").value);
+                $.post("/PostMessage",{recipient:document.getElementById("recipient").value, "msg":document.getElementById("message").value})
+                .done(function(data){
+                    alert("sent");
+                    });
+            }
+        -->
+    </script>
+</head>
+</html>
