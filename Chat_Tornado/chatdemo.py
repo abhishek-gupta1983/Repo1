@@ -35,6 +35,7 @@ class MessageBuffer(object):
         self.cache_size = 200
 
     def wait_for_messages(self, callback, cursor=None):
+        
         if cursor:
             new_count = 0
             for msg in reversed(self.cache):
