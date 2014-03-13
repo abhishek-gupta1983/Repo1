@@ -1,0 +1,56 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title>Web chat plugin</title>
+    <link rel="stylesheet" href="{{ static_url("css/chat.css") }}" type="text/css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <table border="1">
+        <tr>
+            <td>
+                Enter nickname: <input type="text" name="loginName" id="loginName"/>
+            </td>
+            <td>
+                <input type="button" name="loginBtn" id="loginBtn" value="Join!!" onclick="chat.join();"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Select recipient:
+            </td>
+            <td>
+                <select id="recipient" name="recipient">
+                    <option value="-1">Select</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div id="nav">
+      <b></b>
+    </div>
+    <div id="inbox">
+        {% for message in messages %}
+          {% module Template("message.html", message=message) %}
+        {% end %}
+      </div>
+    <div id="input">
+        <form action="/chat/message/new" method="post" id="messageform">
+          <table>
+            <tr>
+              <td><input name="body" id="message" style="width:500px"/></td>
+              <td style="padding-left:5px">
+                <input type="submit" value="{{ _("Post") }}"/>
+                <input type="hidden" name="next" value="{{ request.path }}"/>
+                {% module xsrf_form_html() %}
+              </td>
+            </tr>
+          </table>
+        </form>
+    </div>
+</body>
+<head>
+    <script src="{{ static_url("javascript/chat.js") }}"></script>
+</head>
+</html>

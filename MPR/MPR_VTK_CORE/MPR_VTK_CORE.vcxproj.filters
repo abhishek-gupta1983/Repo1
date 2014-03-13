@@ -24,18 +24,12 @@
     <ClInclude Include="MPR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MPRCursror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MPRSlicer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MPR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MPRCursror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MPRSlicer.cpp">
