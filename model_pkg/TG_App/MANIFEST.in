@@ -1,0 +1,6 @@
+include start-TG_App.py
+include *.cfg
+include TG_App/config/*.cfg
+recursive-include TG_App/templates *.html
+recursive-include TG_App/templates *.kid
+recursive-include TG_App/static *
